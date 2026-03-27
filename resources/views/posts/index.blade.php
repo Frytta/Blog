@@ -46,7 +46,7 @@
                             <a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a>
                         </h3>
                         <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                            {!! Str::limit($post->content, 150) !!}
+                            {{ $post->lead ?? Str::limit(strip_tags($post->content), 150) }}
                         </p>
                         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                             <div class="flex items-center gap-2">

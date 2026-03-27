@@ -28,6 +28,12 @@
             <div class="text-red-500">{{ $message }}</div>
         @enderror
 
+        <label>Zajawka</label>
+        <textarea name="lead">{{ old('lead') }}</textarea>
+        @error('lead')
+            <div class="text-red-500">{{ $message }}</div>
+        @enderror
+
         <label>Treść</label>
         <textarea name="content">{{ old('content') }}</textarea>
         @error('content')

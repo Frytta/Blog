@@ -41,16 +41,17 @@
                     {{ $post->title }}
                 </h1>
 
-                <!-- Lead -->
-                <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                    Poznaj najnowszą wersję Laravel i dowiedz się, jak skonfigurować projekt w 5 minut używając Laravel
-                    Sail i Docker. Ten przewodnik przeprowadzi Cię przez cały proces krok po kroku.
-                </p>
+                @if ($post->lead)
+                    <!-- Lead -->
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        {{ $post->lead }}
+                    </p>
+                @endif
 
                 <!-- Content -->
                 <div class="prose prose-lg max-w-none">
                     <p class="text-gray-700 mb-4 leading-relaxed whitespace-pre-line">
-                        {{ $post->content }}
+                        {!! $post->content !!}
                     </p>
                 </div>
 

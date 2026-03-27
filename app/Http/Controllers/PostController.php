@@ -12,7 +12,7 @@ class PostController extends Controller
         $posts = Post::all();
 
         return view('posts.index', [
-            'posts' => $posts
+            'posts' => $posts,
         ]);
     }
 
@@ -21,7 +21,7 @@ class PostController extends Controller
         $post = Post::where('slug', $slug)->firstOrFail();
 
         return view('posts.show', [
-            'post' => $post
+            'post' => $post,
         ]);
     }
 
@@ -35,14 +35,16 @@ class PostController extends Controller
         $parameters = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:posts,slug'],
+            'lead' => ['nullable', 'string'],
             'author' => ['required', 'string', 'max:255'],
-            'content' =>['required', 'string']
+            'content' => ['required', 'string'],
         ]);
 
-        $post = new Post();
+        $post = new Post;
 
         $post->title = $parameters['title'];
         $post->slug = $parameters['slug'];
+        $post->lead = $parameters['lead'] ?? null;
         $post->author = $parameters['author'];
         $post->content = $parameters['content'];
 

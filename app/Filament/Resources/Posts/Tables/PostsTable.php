@@ -23,6 +23,10 @@ class PostsTable
                 TextColumn::make('slug')
                     ->badge()
                     ->searchable(),
+                TextColumn::make('lead')
+                    ->limit(50)
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('author')
                     ->badge()
                     ->color('info')
