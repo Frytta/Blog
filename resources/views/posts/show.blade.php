@@ -5,9 +5,16 @@
         <!-- Post Header -->
         <article class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
             <!-- Featured Image -->
-            <div class="h-96 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <span class="text-9xl">{{ $post->photo ?? '📝' }}</span>
-            </div>
+            @if ($post->photo)
+                <div class="h-96 bg-gray-100">
+                    <img src="{{ asset('storage/' . $post->photo) }}" alt="Banner: {{ $post->title }}"
+                        class="h-full w-full object-cover">
+                </div>
+            @else
+                <div class="h-96 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <span class="text-9xl">📝</span>
+                </div>
+            @endif
 
             <!-- Post Content -->
             <div class="p-8">

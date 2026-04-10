@@ -9,10 +9,12 @@
     @vite(['resources/css/app.css'])
 </head>
 
-<body class="h-full">
+<body class="h-full min-h-screen flex flex-col">
     @include('partials.navigation')
 
-    {{ $slot }}
+    <div class="flex-1">
+        {{ $slot }}
+    </div>
 
     @include('partials.footer')
 

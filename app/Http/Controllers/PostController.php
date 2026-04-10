@@ -59,6 +59,7 @@ class PostController extends Controller
             'lead' => ['nullable', 'string'],
             'author' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'photo' => ['nullable', 'image', 'max:5120'],
         ]);
 
         $post = new Post;
@@ -68,6 +69,10 @@ class PostController extends Controller
         $post->lead = $parameters['lead'] ?? null;
         $post->author = $parameters['author'];
         $post->content = $parameters['content'];
+
+        if ($request->hasFile('photo')) {
+            $post->photo = $request->file('photo')->store('posts', 'public');
+        }
 
         // Post::create($parameters);
 

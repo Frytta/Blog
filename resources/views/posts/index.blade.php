@@ -37,9 +37,16 @@
             @forelse ($posts as $post)
                 <article
                     class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                    <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <span class="text-6xl">{{ $post->photo ?? '📝' }}</span>
-                    </div>
+                    @if ($post->photo)
+                        <div class="h-48 bg-gray-100">
+                            <img src="{{ asset('storage/' . $post->photo) }}" alt="Banner: {{ $post->title }}"
+                                class="h-full w-full object-cover">
+                        </div>
+                    @else
+                        <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <span class="text-6xl">📝</span>
+                        </div>
+                    @endif
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3">
                             @if ($post->is_published)
