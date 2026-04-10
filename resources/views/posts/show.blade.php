@@ -165,23 +165,23 @@
             @if ($comments->count() > 0)
                 <div class="space-y-6">
                     @foreach ($comments as $comment)
-                        <div class="flex gap-4">
+                        <div class="flex gap-5">
                             <div class="flex-shrink-0">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                    class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
                                     {{ strtoupper(substr($comment->author, 0, 2)) }}
                                 </div>
                             </div>
                             <div class="flex-1 space-y-3">
-                                <div class="bg-gray-50 rounded-lg p-4" data-comment-card>
-                                    <div class="flex items-center justify-between mb-2">
+                                <div class="bg-gray-50 rounded-lg px-5 py-2.5" data-comment-card>
+                                    <div class="flex items-center justify-between mb-0.5">
                                         <div class="flex items-center gap-2" data-reaction-group>
-                                            <h4 class="font-semibold text-gray-900">{{ $comment->author }}</h4>
+                                            <h4 class="text-lg font-semibold text-gray-900">{{ $comment->author }}</h4>
 
                                             <form method="POST" action="{{ route('comments.like', $comment) }}" data-reaction-form>
                                                 @csrf
                                                 <button type="submit"
-                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-2.5 py-1.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-2.5 py-0.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
                                                     <span aria-hidden="true" class="text-lg leading-none">▲</span>
                                                     <span data-like-count>{{ $comment->likes }}</span>
                                                 </button>
@@ -190,14 +190,14 @@
                                             <form method="POST" action="{{ route('comments.dislike', $comment) }}" data-reaction-form>
                                                 @csrf
                                                 <button type="submit"
-                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-2.5 py-1.5 text-sm font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-2.5 py-0.5 text-sm font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                                     <span aria-hidden="true" class="text-lg leading-none">▼</span>
                                                     <span data-dislike-count>{{ $comment->dislikes }}</span>
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="flex flex-col items-end gap-1">
-                                            <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                        <div class="flex flex-col items-end gap-2">
+                                            <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
                                             <div class="flex items-center gap-2">
                                                 <button type="button" data-comment-edit-toggle
                                                     class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
@@ -228,7 +228,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="text-gray-700 leading-relaxed whitespace-pre-line" data-comment-content>
+                                    <p class="m-1 text-[17px] text-gray-700 leading-relaxed whitespace-pre-line" data-comment-content>
                                         {{ $comment->content }}
                                     </p>
 
@@ -253,10 +253,10 @@
                                     @if ($comment->replies->isNotEmpty())
                                         <div class="mt-4 space-y-3 border-l-2 border-gray-200 pl-4">
                                             @foreach ($comment->replies as $reply)
-                                                <div class="rounded-lg bg-white p-3" data-comment-card>
-                                                    <div class="mb-1 flex items-center justify-between">
+                                                <div class="rounded-lg bg-white px-4 py-2" data-comment-card>
+                                                    <div class="mb-0.5 flex items-center justify-between">
                                                         <div class="flex items-center gap-2" data-reaction-group>
-                                                            <h5 class="text-sm font-semibold text-gray-900">{{ $reply->author }}</h5>
+                                                            <h5 class="text-base font-semibold text-gray-900">{{ $reply->author }}</h5>
 
                                                             <form method="POST" action="{{ route('comments.like', $reply) }}" data-reaction-form>
                                                                 @csrf
@@ -276,7 +276,7 @@
                                                                 </button>
                                                             </form>
                                                         </div>
-                                                        <div class="flex flex-col items-end gap-1">
+                                                        <div class="flex flex-col items-end gap-1.5">
                                                             <span
                                                                 class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
                                                             <div class="flex items-center gap-2">
@@ -309,7 +309,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <p class="text-sm text-gray-700 whitespace-pre-line" data-comment-content>
+                                                    <p class="m-0 text-[17px] text-gray-700 leading-relaxed whitespace-pre-line" data-comment-content>
                                                         {{ $reply->content }}
                                                     </p>
 
