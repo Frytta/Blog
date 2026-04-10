@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -12,6 +13,7 @@ class PostController extends Controller
         $search = $request->query('search');
 
         $posts = Post::query()
+            ->with('tags')
             ->when($search, function ($query, $searchTerm) {
                 $query->where(function ($subQuery) use ($searchTerm) {
                     $subQuery->where('title', 'like', "%{$searchTerm}%")
@@ -28,9 +30,10 @@ class PostController extends Controller
 
     public function show(string $slug)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::query()->where('slug', $slug)->with('tags')->firstOrFail();
         $post->increment('views');
         $post->refresh();
+        $post->load('tags');
 
         $comments = $post->comments()
             ->whereNull('parent_id')
@@ -48,7 +51,9 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create', [
+            'tags' => Tag::query()->orderBy('name')->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -60,6 +65,8 @@ class PostController extends Controller
             'author' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
             'photo' => ['nullable', 'image', 'max:5120'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['integer', 'exists:tags,id'],
         ]);
 
         $post = new Post;
@@ -77,6 +84,7 @@ class PostController extends Controller
         // Post::create($parameters);
 
         $post->save();
+        $post->tags()->sync($parameters['tags'] ?? []);
 
         return redirect()->route('posts.index');
     }

@@ -49,6 +49,31 @@
                     </div>
 
                     <div class="sm:col-span-2">
+                        <p class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Tagi</p>
+                        <div class="rounded-xl border border-gray-300 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                            <div class="flex flex-wrap gap-2">
+                                @foreach ($tags as $tag)
+                                    <label class="cursor-pointer">
+                                        <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                                            class="peer sr-only" @checked(in_array($tag->id, old('tags', [])))>
+                                        <span
+                                            class="inline-flex rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-600 peer-checked:text-white hover:border-indigo-300 dark:border-gray-600 dark:text-gray-300 dark:hover:border-indigo-500 dark:peer-checked:border-indigo-400 dark:peer-checked:bg-indigo-500 dark:peer-checked:text-white">
+                                            #{{ $tag->name }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Kliknij, aby zaznaczyć lub odznaczyć tag. Tagi tworzysz w panelu Filament.</p>
+                        @error('tags')
+                            <div class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</div>
+                        @enderror
+                        @error('tags.*')
+                            <div class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="sm:col-span-2">
                         <label for="lead" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Zajawka</label>
                         <textarea id="lead" name="lead" rows="3"
                             class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40">{{ old('lead') }}</textarea>

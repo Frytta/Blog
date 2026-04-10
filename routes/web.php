@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HelloController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostReactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,6 +21,10 @@ Route::delete('/posts/{slug}', [PostController::class, 'destroy'])
     ->name('posts.destroy')
     ->missing(fn () => redirect()->route('posts.index')->with('error', 'Post nie istnieje.'));
 Route::post('/posts/{slug}/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::post('/posts/{post:slug}/like', [PostReactionController::class, 'like'])
+    ->name('posts.like');
+Route::post('/posts/{post:slug}/dislike', [PostReactionController::class, 'dislike'])
+    ->name('posts.dislike');
 
 Route::post('/comments/{comment}/like', [CommentController::class, 'like'])
     ->name('comments.like')

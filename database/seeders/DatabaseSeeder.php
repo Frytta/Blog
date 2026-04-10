@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,5 +22,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        Tag::query()->upsert([
+            ['name' => 'Laravel', 'slug' => 'laravel'],
+            ['name' => 'PHP', 'slug' => 'php'],
+            ['name' => 'Filament', 'slug' => 'filament'],
+            ['name' => 'Livewire', 'slug' => 'livewire'],
+            ['name' => 'Tailwind', 'slug' => 'tailwind'],
+            ['name' => 'JavaScript', 'slug' => 'javascript'],
+            ['name' => 'Docker', 'slug' => 'docker'],
+            ['name' => 'DevOps', 'slug' => 'devops'],
+        ], ['slug'], ['name']);
     }
 }

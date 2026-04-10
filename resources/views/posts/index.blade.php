@@ -36,15 +36,41 @@
 
             @forelse ($posts as $post)
                 @php
-                    $fallbackGradients = [
-                        'from-rose-500 via-orange-400 to-amber-300',
-                        'from-indigo-500 via-sky-500 to-cyan-400',
-                        'from-emerald-500 via-teal-400 to-cyan-300',
-                        'from-fuchsia-500 via-violet-500 to-indigo-500',
-                        'from-red-500 via-pink-500 to-purple-500',
-                        'from-lime-500 via-green-500 to-emerald-500',
+                    $gradientPalettes = [
+                        [
+                            ['#ef4444', '#f97316', '#facc15'],
+                            ['#dc2626', '#fb7185', '#f59e0b'],
+                            ['#b91c1c', '#ea580c', '#fde047'],
+                        ],
+                        [
+                            ['#22c55e', '#14b8a6', '#2dd4bf'],
+                            ['#16a34a', '#10b981', '#84cc16'],
+                            ['#15803d', '#0d9488', '#65a30d'],
+                        ],
+                        [
+                            ['#3b82f6', '#0ea5e9', '#22d3ee'],
+                            ['#1d4ed8', '#2563eb', '#06b6d4'],
+                            ['#1e40af', '#0284c7', '#67e8f9'],
+                        ],
+                        [
+                            ['#8b5cf6', '#6366f1', '#06b6d4'],
+                            ['#7c3aed', '#4f46e5', '#38bdf8'],
+                            ['#6d28d9', '#4338ca', '#0ea5e9'],
+                        ],
+                        [
+                            ['#ec4899', '#f43f5e', '#f97316'],
+                            ['#db2777', '#e11d48', '#fb7185'],
+                            ['#be185d', '#f43f5e', '#fdba74'],
+                        ],
                     ];
-                    $fallbackGradient = $fallbackGradients[abs(crc32($post->slug)) % count($fallbackGradients)];
+
+                    $gradientSeed = abs(crc32($post->slug . '-' . $post->id));
+                    $paletteIndex = $gradientSeed % count($gradientPalettes);
+                    $palette = $gradientPalettes[$paletteIndex];
+                    $variantIndex = intdiv($gradientSeed, max(count($gradientPalettes), 1)) % count($palette);
+                    [$colorA, $colorB, $colorC] = $palette[$variantIndex];
+                    $angle = [120, 130, 135, 145][$gradientSeed % 4];
+                    $fallbackGradientStyle = "background-image: linear-gradient({$angle}deg, {$colorA}, {$colorB}, {$colorC});";
                 @endphp
 
                 <article
@@ -55,7 +81,7 @@
                                 class="h-full w-full object-cover">
                         </div>
                     @else
-                        <div class="h-48 bg-gradient-to-br {{ $fallbackGradient }}"></div>
+                        <div class="h-48" style="{{ $fallbackGradientStyle }}"></div>
                     @endif
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3">
@@ -75,6 +101,15 @@
                         <p class="mb-4 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
                             {{ $post->lead ?? Str::limit(strip_tags($post->content), 150) }}
                         </p>
+                        @if ($post->tags->isNotEmpty())
+                            <div class="mb-4 flex flex-wrap gap-2">
+                                @foreach ($post->tags as $tag)
+                                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                        #{{ $tag->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
                         <div class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800">
                             <div class="flex items-center gap-2">
                                 <div
@@ -83,8 +118,24 @@
                                 </div>
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $post->author }}</span>
                             </div>
-                            <div class="text-right">
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">👁 {{ number_format($post->views) }}</p>
+                            <div class="text-right space-y-1" data-post-reaction-group>
+                                <div class="flex items-center justify-end gap-1.5 text-xs font-medium">
+                                    <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">👁 {{ number_format($post->views) }}</span>
+                                    <form method="POST" action="{{ route('posts.like', $post) }}" data-post-reaction-form>
+                                        @csrf
+                                        <button type="submit"
+                                            class="rounded-full border border-orange-200 bg-orange-100 px-2 py-0.5 text-orange-700 transition-colors hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-300 dark:hover:bg-orange-900/50">
+                                            ▲ <span data-like-count>{{ number_format($post->likes) }}</span>
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('posts.dislike', $post) }}" data-post-reaction-form>
+                                        @csrf
+                                        <button type="submit"
+                                            class="rounded-full border border-blue-200 bg-blue-100 px-2 py-0.5 text-blue-700 transition-colors hover:bg-blue-200 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50">
+                                            ▼ <span data-dislike-count>{{ number_format($post->dislikes) }}</span>
+                                        </button>
+                                    </form>
+                                </div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $post->created_at->diffForHumans() }}</p>
                                 <form method="POST" action="{{ route('posts.destroy', $post->slug) }}" class="mt-1"
                                     onsubmit="return confirm('Czy na pewno chcesz usunąć ten post?')">
@@ -121,6 +172,57 @@
             if (event.persisted) {
                 window.location.reload();
             }
+        });
+
+        document.querySelectorAll('[data-post-reaction-form]').forEach((form) => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const reactionGroup = form.closest('[data-post-reaction-group]');
+
+                if (!reactionGroup) {
+                    return;
+                }
+
+                const submitButton = form.querySelector('button[type="submit"]');
+
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new FormData(form),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Nie udalo sie zapisac reakcji.');
+                    }
+
+                    const payload = await response.json();
+                    const likeCount = reactionGroup.querySelector('[data-like-count]');
+                    const dislikeCount = reactionGroup.querySelector('[data-dislike-count]');
+
+                    if (likeCount) {
+                        likeCount.textContent = String(payload.likes ?? 0);
+                    }
+
+                    if (dislikeCount) {
+                        dislikeCount.textContent = String(payload.dislikes ?? 0);
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                }
+            });
         });
     </script>
 

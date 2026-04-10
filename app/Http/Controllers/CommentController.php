@@ -32,7 +32,9 @@ class CommentController extends Controller
             'content' => $parameters['content'],
         ]);
 
-        return redirect()->back()->with('success', 'Komentarz został dodany.');
+        return redirect()->back()
+            ->with('success', 'Komentarz został dodany.')
+            ->with('scrollToComments', true);
     }
 
     public function like(Request $request, Comment $comment): JsonResponse|RedirectResponse

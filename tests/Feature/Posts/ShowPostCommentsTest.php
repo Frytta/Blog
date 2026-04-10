@@ -29,12 +29,19 @@ it('increments post views when opening post page', function () {
 });
 
 it('shows post views count on post page', function () {
-    $post = createPost(['slug' => 'post-z-wyswietleniami', 'views' => 12]);
+    $post = createPost([
+        'slug' => 'post-z-wyswietleniami',
+        'views' => 12,
+        'likes' => 3131,
+        'dislikes' => 1414,
+    ]);
 
     $response = $this->get(route('posts.show', $post->slug));
 
     $response->assertSuccessful();
     $response->assertSee('Wyświetlenia: 13');
+    $response->assertSee('3,131', false);
+    $response->assertSee('1,414', false);
 });
 
 it('shows root comments and nested replies for a post', function () {

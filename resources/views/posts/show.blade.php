@@ -6,15 +6,41 @@
         <article class="mb-8 overflow-hidden rounded-lg bg-white shadow-md transition-colors duration-300 dark:bg-gray-900 dark:shadow-gray-950/60">
             <!-- Featured Image -->
             @php
-                $fallbackGradients = [
-                    'from-rose-500 via-orange-400 to-amber-300',
-                    'from-indigo-500 via-sky-500 to-cyan-400',
-                    'from-emerald-500 via-teal-400 to-cyan-300',
-                    'from-fuchsia-500 via-violet-500 to-indigo-500',
-                    'from-red-500 via-pink-500 to-purple-500',
-                    'from-lime-500 via-green-500 to-emerald-500',
+                $gradientPalettes = [
+                    [
+                        ['#ef4444', '#f97316', '#facc15'],
+                        ['#dc2626', '#fb7185', '#f59e0b'],
+                        ['#b91c1c', '#ea580c', '#fde047'],
+                    ],
+                    [
+                        ['#22c55e', '#14b8a6', '#2dd4bf'],
+                        ['#16a34a', '#10b981', '#84cc16'],
+                        ['#15803d', '#0d9488', '#65a30d'],
+                    ],
+                    [
+                        ['#3b82f6', '#0ea5e9', '#22d3ee'],
+                        ['#1d4ed8', '#2563eb', '#06b6d4'],
+                        ['#1e40af', '#0284c7', '#67e8f9'],
+                    ],
+                    [
+                        ['#8b5cf6', '#6366f1', '#06b6d4'],
+                        ['#7c3aed', '#4f46e5', '#38bdf8'],
+                        ['#6d28d9', '#4338ca', '#0ea5e9'],
+                    ],
+                    [
+                        ['#ec4899', '#f43f5e', '#f97316'],
+                        ['#db2777', '#e11d48', '#fb7185'],
+                        ['#be185d', '#f43f5e', '#fdba74'],
+                    ],
                 ];
-                $fallbackGradient = $fallbackGradients[abs(crc32($post->slug)) % count($fallbackGradients)];
+
+                $gradientSeed = abs(crc32($post->slug . '-' . $post->id));
+                $paletteIndex = $gradientSeed % count($gradientPalettes);
+                $palette = $gradientPalettes[$paletteIndex];
+                $variantIndex = intdiv($gradientSeed, max(count($gradientPalettes), 1)) % count($palette);
+                [$colorA, $colorB, $colorC] = $palette[$variantIndex];
+                $angle = [120, 130, 135, 145][$gradientSeed % 4];
+                $fallbackGradientStyle = "background-image: linear-gradient({$angle}deg, {$colorA}, {$colorB}, {$colorC});";
             @endphp
 
             @if ($post->photo)
@@ -23,7 +49,7 @@
                         class="h-full w-full object-cover">
                 </div>
             @else
-                <div class="h-96 bg-gradient-to-br {{ $fallbackGradient }}"></div>
+                <div class="h-96" style="{{ $fallbackGradientStyle }}"></div>
             @endif
 
             <!-- Post Content -->
@@ -40,10 +66,24 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400">Opublikowano: {{ $post->created_at->format('d F Y') }}</p>
                         </div>
                     </div>
-                    <div class="ml-auto flex gap-2">
+                    <div class="ml-auto flex gap-2 items-center" data-reaction-group>
                         <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">
                             Wyświetlenia: {{ number_format($post->views) }}
                         </span>
+                        <form method="POST" action="{{ route('posts.like', $post) }}" data-reaction-form>
+                            @csrf
+                            <button type="submit"
+                                class="rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700 transition-colors hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-300 dark:hover:bg-orange-900/50">
+                                ▲ <span data-like-count>{{ number_format($post->likes) }}</span>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('posts.dislike', $post) }}" data-reaction-form>
+                            @csrf
+                            <button type="submit"
+                                class="rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-200 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50">
+                                ▼ <span data-dislike-count>{{ number_format($post->dislikes) }}</span>
+                            </button>
+                        </form>
 
                         <form method="POST" action="{{ route('posts.destroy', $post->slug) }}"
                             onsubmit="return confirm('Czy na pewno chcesz usunąć ten post?')">
@@ -95,22 +135,14 @@
                 <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
                     <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">Tagi:</p>
                     <div class="flex flex-wrap gap-2">
-                        <span
-                            class="cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            #laravel
-                        </span>
-                        <span
-                            class="cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            #php
-                        </span>
-                        <span
-                            class="cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            #docker
-                        </span>
-                        <span
-                            class="cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                            #tutorial
-                        </span>
+                        @forelse ($post->tags as $tag)
+                            <span
+                                class="cursor-pointer rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                                #{{ $tag->name }}
+                            </span>
+                        @empty
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Brak tagów.</span>
+                        @endforelse
                     </div>
                 </div>
 
@@ -217,7 +249,7 @@
                                             <form method="POST" action="{{ route('comments.like', $comment) }}" data-reaction-form>
                                                 @csrf
                                                 <button type="submit"
-                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-2.5 py-0.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-2.5 py-0.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 dark:border-orange-900/60 dark:bg-orange-950/30 dark:text-orange-300 dark:hover:bg-orange-900/40 dark:focus:ring-orange-500/40">
                                                     <span aria-hidden="true" class="text-lg leading-none">▲</span>
                                                     <span data-like-count>{{ $comment->likes }}</span>
                                                 </button>
@@ -226,7 +258,7 @@
                                             <form method="POST" action="{{ route('comments.dislike', $comment) }}" data-reaction-form>
                                                 @csrf
                                                 <button type="submit"
-                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-2.5 py-0.5 text-sm font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-2.5 py-0.5 text-sm font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40 dark:focus:ring-blue-500/40">
                                                     <span aria-hidden="true" class="text-lg leading-none">▼</span>
                                                     <span data-dislike-count>{{ $comment->dislikes }}</span>
                                                 </button>
@@ -297,7 +329,7 @@
                                                             <form method="POST" action="{{ route('comments.like', $reply) }}" data-reaction-form>
                                                                 @csrf
                                                                 <button type="submit"
-                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-orange-300 bg-orange-50/70 px-2 py-1 text-xs font-semibold text-orange-600 transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-orange-300 bg-orange-50/70 px-2 py-1 text-xs font-semibold text-orange-600 transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 dark:border-orange-900/60 dark:bg-orange-950/30 dark:text-orange-300 dark:hover:bg-orange-900/40 dark:focus:ring-orange-500/40">
                                                                     <span aria-hidden="true" class="text-base leading-none">▲</span>
                                                                     <span data-like-count>{{ $reply->likes }}</span>
                                                                 </button>
@@ -306,7 +338,7 @@
                                                             <form method="POST" action="{{ route('comments.dislike', $reply) }}" data-reaction-form>
                                                                 @csrf
                                                                 <button type="submit"
-                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 bg-blue-50/70 px-2 py-1 text-xs font-semibold text-blue-900 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 bg-blue-50/70 px-2 py-1 text-xs font-semibold text-blue-900 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40 dark:focus:ring-blue-500/40">
                                                                     <span aria-hidden="true" class="text-base leading-none">▼</span>
                                                                     <span data-dislike-count>{{ $reply->dislikes }}</span>
                                                                 </button>
@@ -412,68 +444,19 @@
             @endif
         </section>
 
-        <!-- Related Posts -->
-        <section class="mt-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Powiązane artykuły</h2>
-            <div class="grid gap-6 md:grid-cols-3">
-
-                <!-- Related Post 1 -->
-                <a href="#" class="group">
-                    <article
-                        class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                        <div
-                            class="h-32 bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
-                            <span class="text-5xl">🤖</span>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 line-clamp-2 mb-2">
-                                GitHub Copilot Agent Mode w praktyce
-                            </h3>
-                            <p class="text-sm text-gray-500">8 min czytania</p>
-                        </div>
-                    </article>
-                </a>
-
-                <!-- Related Post 2 -->
-                <a href="#" class="group">
-                    <article
-                        class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                        <div class="h-32 bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
-                            <span class="text-5xl">⚛️</span>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 line-clamp-2 mb-2">
-                                Inertia.js - most między Laravel a React
-                            </h3>
-                            <p class="text-sm text-gray-500">12 min czytania</p>
-                        </div>
-                    </article>
-                </a>
-
-                <!-- Related Post 3 -->
-                <a href="#" class="group">
-                    <article
-                        class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                        <div
-                            class="h-32 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                            <span class="text-5xl">🎨</span>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 line-clamp-2 mb-2">
-                                Laravel Filament - admin panel w 15 minut
-                            </h3>
-                            <p class="text-sm text-gray-500">6 min czytania</p>
-                        </div>
-                    </article>
-                </a>
-
-            </div>
-        </section>
-
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const shouldScrollToComments = @json((bool) session('scrollToComments'));
+
+            if (shouldScrollToComments) {
+                document.getElementById('comments')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+
             document.querySelectorAll('[data-reply-toggle]').forEach((toggleButton) => {
                 const container = toggleButton.closest('[data-reply-container]');
                 const panel = container?.querySelector('[data-reply-panel]');
