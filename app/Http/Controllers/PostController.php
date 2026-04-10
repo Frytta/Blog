@@ -75,4 +75,12 @@ class PostController extends Controller
 
         return redirect()->route('posts.index');
     }
+
+    public function destroy(string $slug)
+    {
+        $post = Post::query()->where('slug', $slug)->firstOrFail();
+        $post->delete();
+
+        return redirect()->route('posts.index')->with('success', 'Post został usunięty.');
+    }
 }

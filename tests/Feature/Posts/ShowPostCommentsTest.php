@@ -88,3 +88,21 @@ it('shows all post comments on post page', function () {
         return $comments->count() === 3;
     });
 });
+
+it('deletes post from post page endpoint', function () {
+    $post = createPost(['slug' => 'post-do-usuniecia']);
+
+    $comment = Comment::query()->create([
+        'post_id' => $post->id,
+        'author' => 'Autor komentarza',
+        'content' => 'Komentarz do usuwanego posta',
+    ]);
+
+    $response = $this->delete(route('posts.destroy', $post->slug));
+
+    $response->assertRedirect(route('posts.index'));
+    $response->assertSessionHas('success', 'Post został usunięty.');
+
+    expect(Post::query()->whereKey($post->id)->exists())->toBeFalse();
+    expect(Comment::query()->whereKey($comment->id)->exists())->toBeFalse();
+});

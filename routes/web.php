@@ -16,6 +16,9 @@ Route::get('/posts/create', [PostController::class, 'create'])->name('posts.crea
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
+Route::delete('/posts/{slug}', [PostController::class, 'destroy'])
+    ->name('posts.destroy')
+    ->missing(fn () => redirect()->route('posts.index')->with('error', 'Post nie istnieje.'));
 Route::post('/posts/{slug}/comments', [CommentController::class, 'store'])->name('comments.store');
 
 Route::post('/comments/{comment}/like', [CommentController::class, 'like'])

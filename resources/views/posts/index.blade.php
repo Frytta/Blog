@@ -7,6 +7,18 @@
             <p class="mt-2 text-gray-600">Odkryj najnowsze artykuły z świata programowania</p>
         </div>
 
+        @if (session('success'))
+            <div class="mb-6 rounded-lg bg-green-100 px-4 py-3 text-sm font-medium text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-6 rounded-lg bg-red-100 px-4 py-3 text-sm font-medium text-red-800">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <!-- Filters/Search Bar -->
         <form method="GET" action="{{ route('posts.index') }}" class="mb-6 flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
@@ -57,6 +69,20 @@
                             <div class="text-right">
                                 <p class="text-xs font-medium text-gray-500">👁 {{ number_format($post->views) }}</p>
                                 <p class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
+                                <form method="POST" action="{{ route('posts.destroy', $post->slug) }}" class="mt-1"
+                                    onsubmit="return confirm('Czy na pewno chcesz usunąć ten post?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-colors hover:bg-red-100"
+                                        title="Usuń post" aria-label="Usuń post">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                            stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 7.5h12m-9.75 0V6A1.5 1.5 0 019.75 4.5h4.5A1.5 1.5 0 0115.75 6v1.5m-7.5 0v10.75c0 .966.784 1.75 1.75 1.75h4.5a1.75 1.75 0 001.75-1.75V7.5" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -72,6 +98,14 @@
 
         </div>
     </main>
+
+    <script>
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 
 
 </x-layout>
