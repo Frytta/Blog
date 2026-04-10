@@ -15,6 +15,7 @@ class Post extends Model
         'author',
         'photo',
         'is_published',
+        'views',
     ];
 
     public function comments(): HasMany

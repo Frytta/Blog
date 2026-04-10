@@ -54,7 +54,10 @@
                                 </div>
                                 <span class="text-sm text-gray-700 font-medium">{{ $post->author }}</span>
                             </div>
-                            <span class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
+                            <div class="text-right">
+                                <p class="text-xs font-medium text-gray-500">👁 {{ number_format($post->views) }}</p>
+                                <p class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
+                            </div>
                         </div>
                     </div>
                 </article>

@@ -29,6 +29,9 @@ class PostController extends Controller
     public function show(string $slug)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
+        $post->increment('views');
+        $post->refresh();
+
         $comments = $post->comments()
             ->whereNull('parent_id')
             ->with(['replies' => fn ($query) => $query->latest()])

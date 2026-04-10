@@ -15,8 +15,27 @@ function createPost(array $overrides = []): Post
         'content' => fake()->paragraphs(3, true),
         'author' => fake()->name(),
         'is_published' => true,
+        'views' => 0,
     ], $overrides));
 }
+
+it('increments post views when opening post page', function () {
+    $post = createPost(['slug' => 'post-z-licznikiem-views', 'views' => 0]);
+
+    $this->get(route('posts.show', $post->slug))
+        ->assertSuccessful();
+
+    expect($post->fresh()->views)->toBe(1);
+});
+
+it('shows post views count on post page', function () {
+    $post = createPost(['slug' => 'post-z-wyswietleniami', 'views' => 12]);
+
+    $response = $this->get(route('posts.show', $post->slug));
+
+    $response->assertSuccessful();
+    $response->assertSee('Wyświetlenia: 13');
+});
 
 it('shows root comments and nested replies for a post', function () {
     $post = createPost(['slug' => 'post-z-komentarzami']);
