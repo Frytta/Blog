@@ -173,67 +173,164 @@
                                 </div>
                             </div>
                             <div class="flex-1 space-y-3">
-                                <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="bg-gray-50 rounded-lg p-4" data-comment-card>
                                     <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-semibold text-gray-900">{{ $comment->author }}</h4>
-                                        <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                        <div class="flex items-center gap-2" data-reaction-group>
+                                            <h4 class="font-semibold text-gray-900">{{ $comment->author }}</h4>
+
+                                            <form method="POST" action="{{ route('comments.like', $comment) }}" data-reaction-form>
+                                                @csrf
+                                                <button type="submit"
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-2.5 py-1.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                    <span aria-hidden="true" class="text-lg leading-none">▲</span>
+                                                    <span data-like-count>{{ $comment->likes }}</span>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{{ route('comments.dislike', $comment) }}" data-reaction-form>
+                                                @csrf
+                                                <button type="submit"
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-2.5 py-1.5 text-sm font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                    <span aria-hidden="true" class="text-lg leading-none">▼</span>
+                                                    <span data-dislike-count>{{ $comment->dislikes }}</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="flex flex-col items-end gap-1">
+                                            <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" data-comment-edit-toggle
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+                                                    title="Edytuj komentarz" aria-label="Edytuj komentarz">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.592c.55 0 1.02.398 1.11.94l.213 1.279a1.125 1.125 0 001.057.93l1.285.058c.544.024.99.44 1.06.98l.334 2.57c.071.54-.25 1.062-.761 1.233l-1.21.404a1.125 1.125 0 00-.733 1.015l-.058 1.285a1.125 1.125 0 00.54 1.03l1.084.665c.46.282.64.865.426 1.364l-1.017 2.372a1.125 1.125 0 01-1.28.64l-1.265-.284a1.125 1.125 0 00-1.154.45l-.74 1.05a1.125 1.125 0 01-1.82 0l-.74-1.05a1.125 1.125 0 00-1.154-.45l-1.265.284a1.125 1.125 0 01-1.28-.64L3.7 17.835a1.125 1.125 0 01.426-1.364l1.084-.665a1.125 1.125 0 00.54-1.03l-.058-1.285a1.125 1.125 0 00-.733-1.015l-1.21-.404a1.125 1.125 0 01-.761-1.233l.334-2.57a1.125 1.125 0 011.06-.98l1.285-.058a1.125 1.125 0 001.057-.93l.213-1.279z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </button>
+
+                                                <form method="POST" action="{{ route('comments.destroy', $comment) }}"
+                                                    onsubmit="return confirm('Czy na pewno chcesz usunąć komentarz?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-colors hover:bg-red-100"
+                                                        title="Usuń komentarz" aria-label="Usuń komentarz">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M6 7.5h12m-9.75 0V6A1.5 1.5 0 019.75 4.5h4.5A1.5 1.5 0 0115.75 6v1.5m-7.5 0v10.75c0 .966.784 1.75 1.75 1.75h4.5a1.75 1.75 0 001.75-1.75V7.5" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                                    <p class="text-gray-700 leading-relaxed whitespace-pre-line" data-comment-content>
                                         {{ $comment->content }}
                                     </p>
 
-                                    <div class="mt-4 flex items-center gap-2" data-reaction-group>
-                                        <form method="POST" action="{{ route('comments.like', $comment) }}" data-reaction-form>
-                                            @csrf
+                                    <form method="POST" action="{{ route('comments.update', $comment) }}"
+                                        class="hidden mt-2 space-y-2" data-comment-edit-form>
+                                        @csrf
+                                        @method('PATCH')
+                                        <textarea name="content" required rows="3"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500 resize-none">{{ $comment->content }}</textarea>
+                                        <div class="flex items-center gap-2">
                                             <button type="submit"
-                                                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-orange-300 bg-orange-50/70 px-3.5 py-2 text-base font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
-                                                <span aria-hidden="true" class="text-xl leading-none">▲</span>
-                                                <span data-like-count>{{ $comment->likes }}</span>
+                                                class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 transition-colors">
+                                                Zapisz zmiany
                                             </button>
-                                        </form>
-
-                                        <form method="POST" action="{{ route('comments.dislike', $comment) }}" data-reaction-form>
-                                            @csrf
-                                            <button type="submit"
-                                                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50/70 px-3.5 py-2 text-base font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                                <span aria-hidden="true" class="text-xl leading-none">▼</span>
-                                                <span data-dislike-count>{{ $comment->dislikes }}</span>
+                                            <button type="button" data-comment-edit-cancel
+                                                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                                                Anuluj
                                             </button>
-                                        </form>
-                                    </div>
+                                        </div>
+                                    </form>
 
                                     @if ($comment->replies->isNotEmpty())
                                         <div class="mt-4 space-y-3 border-l-2 border-gray-200 pl-4">
                                             @foreach ($comment->replies as $reply)
-                                                <div class="rounded-lg bg-white p-3">
+                                                <div class="rounded-lg bg-white p-3" data-comment-card>
                                                     <div class="mb-1 flex items-center justify-between">
-                                                        <h5 class="text-sm font-semibold text-gray-900">{{ $reply->author }}</h5>
-                                                        <span
-                                                            class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
+                                                        <div class="flex items-center gap-2" data-reaction-group>
+                                                            <h5 class="text-sm font-semibold text-gray-900">{{ $reply->author }}</h5>
+
+                                                            <form method="POST" action="{{ route('comments.like', $reply) }}" data-reaction-form>
+                                                                @csrf
+                                                                <button type="submit"
+                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-orange-300 bg-orange-50/70 px-2 py-1 text-xs font-semibold text-orange-600 transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                                    <span aria-hidden="true" class="text-base leading-none">▲</span>
+                                                                    <span data-like-count>{{ $reply->likes }}</span>
+                                                                </button>
+                                                            </form>
+
+                                                            <form method="POST" action="{{ route('comments.dislike', $reply) }}" data-reaction-form>
+                                                                @csrf
+                                                                <button type="submit"
+                                                                    class="inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 bg-blue-50/70 px-2 py-1 text-xs font-semibold text-blue-900 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                                    <span aria-hidden="true" class="text-base leading-none">▼</span>
+                                                                    <span data-dislike-count>{{ $reply->dislikes }}</span>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                        <div class="flex flex-col items-end gap-1">
+                                                            <span
+                                                                class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
+                                                            <div class="flex items-center gap-2">
+                                                                <button type="button" data-comment-edit-toggle
+                                                                    class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+                                                                    title="Edytuj odpowiedź" aria-label="Edytuj odpowiedź">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                                        stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.592c.55 0 1.02.398 1.11.94l.213 1.279a1.125 1.125 0 001.057.93l1.285.058c.544.024.99.44 1.06.98l.334 2.57c.071.54-.25 1.062-.761 1.233l-1.21.404a1.125 1.125 0 00-.733 1.015l-.058 1.285a1.125 1.125 0 00.54 1.03l1.084.665c.46.282.64.865.426 1.364l-1.017 2.372a1.125 1.125 0 01-1.28.64l-1.265-.284a1.125 1.125 0 00-1.154.45l-.74 1.05a1.125 1.125 0 01-1.82 0l-.74-1.05a1.125 1.125 0 00-1.154-.45l-1.265.284a1.125 1.125 0 01-1.28-.64L3.7 17.835a1.125 1.125 0 01.426-1.364l1.084-.665a1.125 1.125 0 00.54-1.03l-.058-1.285a1.125 1.125 0 00-.733-1.015l-1.21-.404a1.125 1.125 0 01-.761-1.233l.334-2.57a1.125 1.125 0 011.06-.98l1.285-.058a1.125 1.125 0 001.057-.93l.213-1.279z" />
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                    </svg>
+                                                                </button>
+
+                                                                <form method="POST" action="{{ route('comments.destroy', $reply) }}"
+                                                                    onsubmit="return confirm('Czy na pewno chcesz usunąć odpowiedź?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-colors hover:bg-red-100"
+                                                                        title="Usuń odpowiedź" aria-label="Usuń odpowiedź">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                                            stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                                d="M6 7.5h12m-9.75 0V6A1.5 1.5 0 019.75 4.5h4.5A1.5 1.5 0 0115.75 6v1.5m-7.5 0v10.75c0 .966.784 1.75 1.75 1.75h4.5a1.75 1.75 0 001.75-1.75V7.5" />
+                                                                        </svg>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <p class="text-sm text-gray-700 whitespace-pre-line">
+                                                    <p class="text-sm text-gray-700 whitespace-pre-line" data-comment-content>
                                                         {{ $reply->content }}
                                                     </p>
 
-                                                    <div class="mt-3 flex items-center gap-2" data-reaction-group>
-                                                        <form method="POST" action="{{ route('comments.like', $reply) }}" data-reaction-form>
-                                                            @csrf
+                                                    <form method="POST" action="{{ route('comments.update', $reply) }}"
+                                                        class="hidden mt-2 space-y-2" data-comment-edit-form>
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <textarea name="content" required rows="2"
+                                                            class="w-full rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-transparent focus:ring-2 focus:ring-indigo-500 resize-none">{{ $reply->content }}</textarea>
+                                                        <div class="flex items-center gap-2">
                                                             <button type="submit"
-                                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-3 py-1.5 text-sm font-semibold text-orange-600 transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
-                                                                <span aria-hidden="true" class="text-lg leading-none">▲</span>
-                                                                <span data-like-count>{{ $reply->likes }}</span>
+                                                                class="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 transition-colors">
+                                                                Zapisz
                                                             </button>
-                                                        </form>
+                                                            <button type="button" data-comment-edit-cancel
+                                                                class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                Anuluj
+                                                            </button>
+                                                        </div>
+                                                    </form>
 
-                                                        <form method="POST" action="{{ route('comments.dislike', $reply) }}" data-reaction-form>
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-3 py-1.5 text-sm font-semibold text-blue-900 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                                                <span aria-hidden="true" class="text-lg leading-none">▼</span>
-                                                                <span data-dislike-count>{{ $reply->dislikes }}</span>
-                                                            </button>
-                                                        </form>
-                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -412,6 +509,28 @@
                             submitButton.disabled = false;
                         }
                     }
+                });
+            });
+
+            document.querySelectorAll('[data-comment-edit-toggle]').forEach((toggleButton) => {
+                const card = toggleButton.closest('[data-comment-card]');
+                const content = card?.querySelector('[data-comment-content]');
+                const editForm = card?.querySelector('[data-comment-edit-form]');
+
+                if (!content || !editForm) {
+                    return;
+                }
+
+                toggleButton.addEventListener('click', () => {
+                    content.classList.add('hidden');
+                    editForm.classList.remove('hidden');
+                });
+
+                const cancelButton = editForm.querySelector('[data-comment-edit-cancel]');
+
+                cancelButton?.addEventListener('click', () => {
+                    editForm.classList.add('hidden');
+                    content.classList.remove('hidden');
                 });
             });
         });

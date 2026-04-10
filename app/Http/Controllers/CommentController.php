@@ -45,6 +45,26 @@ class CommentController extends Controller
         return $this->react($request, $comment, 'dislike');
     }
 
+    public function update(Request $request, Comment $comment): RedirectResponse
+    {
+        $parameters = $request->validate([
+            'content' => ['required', 'string'],
+        ]);
+
+        $comment->update([
+            'content' => $parameters['content'],
+        ]);
+
+        return redirect()->back()->with('success', 'Komentarz został zaktualizowany.');
+    }
+
+    public function destroy(Comment $comment): RedirectResponse
+    {
+        $comment->delete();
+
+        return redirect()->back()->with('success', 'Komentarz został usunięty.');
+    }
+
     private function react(Request $request, Comment $comment, string $reaction): JsonResponse|RedirectResponse
     {
         $sessionKey = "comment_reactions.{$comment->id}";

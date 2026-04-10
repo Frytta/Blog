@@ -105,3 +105,69 @@ it('rejects reply when parent comment belongs to another post', function () {
     $response->assertRedirect(route('posts.show', $post->slug));
     $response->assertSessionHasErrors(['parent_id']);
 });
+
+it('updates comment content', function () {
+    $post = makePost();
+
+    $comment = Comment::query()->create([
+        'post_id' => $post->id,
+        'author' => 'Anna',
+        'content' => 'Stara tresc',
+    ]);
+
+    $response = $this->from(route('posts.show', $post->slug))
+        ->patch(route('comments.update', $comment), [
+            'content' => 'Nowa tresc komentarza',
+        ]);
+
+    $response->assertRedirect(route('posts.show', $post->slug));
+    $response->assertSessionHas('success', 'Komentarz został zaktualizowany.');
+
+    $this->assertDatabaseHas('comments', [
+        'id' => $comment->id,
+        'content' => 'Nowa tresc komentarza',
+    ]);
+});
+
+it('validates required content when updating comment', function () {
+    $post = makePost();
+
+    $comment = Comment::query()->create([
+        'post_id' => $post->id,
+        'author' => 'Anna',
+        'content' => 'Bez zmian',
+    ]);
+
+    $response = $this->from(route('posts.show', $post->slug))
+        ->patch(route('comments.update', $comment), [
+            'content' => '',
+        ]);
+
+    $response->assertRedirect(route('posts.show', $post->slug));
+    $response->assertSessionHasErrors(['content']);
+
+    $this->assertDatabaseHas('comments', [
+        'id' => $comment->id,
+        'content' => 'Bez zmian',
+    ]);
+});
+
+it('deletes comment', function () {
+    $post = makePost();
+
+    $comment = Comment::query()->create([
+        'post_id' => $post->id,
+        'author' => 'Anna',
+        'content' => 'Do usuniecia',
+    ]);
+
+    $response = $this->from(route('posts.show', $post->slug))
+        ->delete(route('comments.destroy', $comment));
+
+    $response->assertRedirect(route('posts.show', $post->slug));
+    $response->assertSessionHas('success', 'Komentarz został usunięty.');
+
+    $this->assertDatabaseMissing('comments', [
+        'id' => $comment->id,
+    ]);
+});

@@ -25,3 +25,11 @@ Route::post('/comments/{comment}/like', [CommentController::class, 'like'])
 Route::post('/comments/{comment}/dislike', [CommentController::class, 'dislike'])
     ->name('comments.dislike')
     ->missing(fn () => redirect()->back()->with('error', 'Komentarz nie istnieje.'));
+
+Route::patch('/comments/{comment}', [CommentController::class, 'update'])
+    ->name('comments.update')
+    ->missing(fn () => redirect()->back()->with('error', 'Komentarz nie istnieje.'));
+
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
+    ->name('comments.destroy')
+    ->missing(fn () => redirect()->back()->with('error', 'Komentarz nie istnieje.'));
