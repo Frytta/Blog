@@ -8,18 +8,16 @@
         </div>
 
         <!-- Filters/Search Bar -->
-        <div class="mb-6 flex flex-col sm:flex-row gap-4">
+        <form method="GET" action="{{ route('posts.index') }}" class="mb-6 flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
-                <input type="text" placeholder="Szukaj postów..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Szukaj postów..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
             </div>
-            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option>Wszystkie kategorie</option>
-                <option>Laravel</option>
-                <option>React</option>
-                <option>AI & Copilot</option>
-            </select>
-        </div>
+            <button type="submit"
+                class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+                Szukaj
+            </button>
+        </form>
 
         <!-- Posts Grid -->
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

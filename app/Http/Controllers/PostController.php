@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::all();
+        $search = $request->query('search');
+
+        $posts = Post::query()
+            ->when($search, function ($query, $searchTerm) {
+                $query->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where('title', 'like', "%{$searchTerm}%")
+                        ->orWhere('content', 'like', "%{$searchTerm}%");
+                });
+            })
+            ->latest()
+            ->get();
 
         return view('posts.index', [
             'posts' => $posts,
@@ -19,9 +29,17 @@ class PostController extends Controller
     public function show(string $slug)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
+        $comments = $post->comments()
+            ->whereNull('parent_id')
+            ->with(['replies' => fn ($query) => $query->latest()])
+            ->latest()
+            ->get();
+        $commentsCount = $post->comments()->count();
 
         return view('posts.show', [
             'post' => $post,
+            'comments' => $comments,
+            'commentsCount' => $commentsCount,
         ]);
     }
 

@@ -98,34 +98,46 @@
         </article>
 
         <!-- Comments Section -->
-        <section class="bg-white rounded-lg shadow-md p-8">
+        <section id="comments" class="bg-white rounded-lg shadow-md p-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                Komentarze (3)
+                Komentarze ({{ $commentsCount }})
             </h2>
+
+            @if (session('success'))
+                <div class="mb-6 rounded-lg bg-green-100 px-4 py-3 text-sm font-medium text-green-800">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-6 rounded-lg bg-red-100 px-4 py-3 text-sm font-medium text-red-800">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             <!-- Comment Form -->
             <div class="mb-8 pb-8 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Dodaj komentarz</h3>
-                <form class="space-y-4">
+
+                @if ($errors->any())
+                    <ul class="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                <form method="POST" action="{{ route('comments.store', $post->slug) }}" class="space-y-4">
+                    @csrf
+
                     <!-- Name -->
                     <div>
                         <label for="author" class="block text-sm font-medium text-gray-700 mb-2">
                             Twoje imię *
                         </label>
-                        <input type="text" id="author" name="author" required
+                        <input type="text" id="author" name="author" required value="{{ old('author') }}"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             placeholder="Jan Kowalski">
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            Email *
-                        </label>
-                        <input type="email" id="email" name="email" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            placeholder="jan@example.com">
-                        <p class="mt-1 text-sm text-gray-500">Email nie będzie publikowany</p>
                     </div>
 
                     <!-- Comment Content -->
@@ -135,7 +147,7 @@
                         </label>
                         <textarea id="content" name="content" required rows="5"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                            placeholder="Podziel się swoimi przemyśleniami..."></textarea>
+                            placeholder="Podziel się swoimi przemyśleniami...">{{ old('content') }}</textarea>
                     </div>
 
                     <!-- Submit Button -->
@@ -150,155 +162,121 @@
             </div>
 
             <!-- Comments List -->
-            <div class="space-y-6">
-
-                <!-- Comment 1 -->
-                <div class="flex gap-4">
-                    <div class="flex-shrink-0">
-                        <div
-                            class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            AN
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-semibold text-gray-900">Anna Nowak</h4>
-                                <span class="text-sm text-gray-500">2 godziny temu</span>
-                            </div>
-                            <p class="text-gray-700 leading-relaxed">
-                                Świetny artykuł! Właśnie zaczynałam przygodę z Laravel i ten tutorial bardzo mi pomógł.
-                                Sail to genialne rozwiązanie - wszystko działa od razu bez konfiguracji 🚀
-                            </p>
-                            <div class="mt-3 flex items-center gap-4">
-                                <button class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-                                    Odpowiedz
-                                </button>
-                                <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    <span>12</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comment 2 -->
-                <div class="flex gap-4">
-                    <div class="flex-shrink-0">
-                        <div
-                            class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            MK
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-semibold text-gray-900">Marek Kowalczyk</h4>
-                                <span class="text-sm text-gray-500">5 godzin temu</span>
-                            </div>
-                            <p class="text-gray-700 leading-relaxed">
-                                Czy Laravel 11 ma jakieś breaking changes w porównaniu do wersji 10? Planujemy migrację
-                                projektu i zastanawiam się, ile pracy nas czeka.
-                            </p>
-                            <div class="mt-3 flex items-center gap-4">
-                                <button class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-                                    Odpowiedz
-                                </button>
-                                <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    <span>5</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Nested Reply -->
-                        <div class="ml-8 mt-4 flex gap-4">
+            @if ($comments->count() > 0)
+                <div class="space-y-6">
+                    @foreach ($comments as $comment)
+                        <div class="flex gap-4">
                             <div class="flex-shrink-0">
                                 <div
-                                    class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                    JK
+                                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                    {{ strtoupper(substr($comment->author, 0, 2)) }}
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+                            <div class="flex-1 space-y-3">
+                                <div class="bg-gray-50 rounded-lg p-4">
                                     <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <h4 class="font-semibold text-gray-900">Jan Kowalski</h4>
-                                            <span
-                                                class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">Autor</span>
-                                        </div>
-                                        <span class="text-sm text-gray-500">3 godziny temu</span>
+                                        <h4 class="font-semibold text-gray-900">{{ $comment->author }}</h4>
+                                        <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <p class="text-gray-700 leading-relaxed">
-                                        @Marek - Breaking changes są minimalne! Głównie dotyczą struktury katalogów i
-                                        konfiguracji. Polecam sprawdzić oficjalny upgrade guide na laravel.com
+                                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                                        {{ $comment->content }}
                                     </p>
-                                    <div class="mt-3 flex items-center gap-4">
-                                        <button
-                                            class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                            </svg>
-                                            <span>8</span>
-                                        </button>
+
+                                    <div class="mt-4 flex items-center gap-2" data-reaction-group>
+                                        <form method="POST" action="{{ route('comments.like', $comment) }}" data-reaction-form>
+                                            @csrf
+                                            <button type="submit"
+                                                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-orange-300 bg-orange-50/70 px-3.5 py-2 text-base font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                <span aria-hidden="true" class="text-xl leading-none">▲</span>
+                                                <span data-like-count>{{ $comment->likes }}</span>
+                                            </button>
+                                        </form>
+
+                                        <form method="POST" action="{{ route('comments.dislike', $comment) }}" data-reaction-form>
+                                            @csrf
+                                            <button type="submit"
+                                                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-300 bg-blue-50/70 px-3.5 py-2 text-base font-bold text-blue-900 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                <span aria-hidden="true" class="text-xl leading-none">▼</span>
+                                                <span data-dislike-count>{{ $comment->dislikes }}</span>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    @if ($comment->replies->isNotEmpty())
+                                        <div class="mt-4 space-y-3 border-l-2 border-gray-200 pl-4">
+                                            @foreach ($comment->replies as $reply)
+                                                <div class="rounded-lg bg-white p-3">
+                                                    <div class="mb-1 flex items-center justify-between">
+                                                        <h5 class="text-sm font-semibold text-gray-900">{{ $reply->author }}</h5>
+                                                        <span
+                                                            class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                    <p class="text-sm text-gray-700 whitespace-pre-line">
+                                                        {{ $reply->content }}
+                                                    </p>
+
+                                                    <div class="mt-3 flex items-center gap-2" data-reaction-group>
+                                                        <form method="POST" action="{{ route('comments.like', $reply) }}" data-reaction-form>
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-300 bg-orange-50/70 px-3 py-1.5 text-sm font-semibold text-orange-600 transition-colors hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                                                <span aria-hidden="true" class="text-lg leading-none">▲</span>
+                                                                <span data-like-count>{{ $reply->likes }}</span>
+                                                            </button>
+                                                        </form>
+
+                                                        <form method="POST" action="{{ route('comments.dislike', $reply) }}" data-reaction-form>
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50/70 px-3 py-1.5 text-sm font-semibold text-blue-900 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                                                <span aria-hidden="true" class="text-lg leading-none">▼</span>
+                                                                <span data-dislike-count>{{ $reply->dislikes }}</span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    <div data-reply-container class="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+                                        <div class="flex justify-start">
+                                            <button type="button" data-reply-toggle
+                                                class="inline-flex items-center justify-center rounded-lg bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                                Odpowiedz
+                                            </button>
+                                        </div>
+
+                                        <div data-reply-panel class="mt-3 overflow-hidden transition-all duration-300 ease-out"
+                                            style="max-height: 0; opacity: 0;">
+                                            <form method="POST" action="{{ route('comments.store', $post->slug) }}"
+                                                class="space-y-2">
+                                                @csrf
+                                                <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+
+                                                <input type="text" name="author" required
+                                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+                                                    placeholder="Twoje imię">
+
+                                                <textarea name="content" required rows="3"
+                                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500 resize-none"
+                                                    placeholder="Napisz odpowiedź..."></textarea>
+
+                                                <button type="submit"
+                                                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
+                                                    Dodaj odpowiedź
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-
-                <!-- Comment 3 -->
-                <div class="flex gap-4">
-                    <div class="flex-shrink-0">
-                        <div
-                            class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            KW
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-semibold text-gray-900">Kasia Wiśniewska</h4>
-                                <span class="text-sm text-gray-500">1 dzień temu</span>
-                            </div>
-                            <p class="text-gray-700 leading-relaxed">
-                                Czy ktoś używał Sail w produkcji? Czy to tylko narzędzie developerskie, czy można na nim
-                                oprzeć deployment?
-                            </p>
-                            <div class="mt-3 flex items-center gap-4">
-                                <button class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-                                    Odpowiedz
-                                </button>
-                                <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    <span>3</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Load More Comments -->
-            <div class="mt-8 text-center">
-                <button class="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
-                    Załaduj więcej komentarzy
-                </button>
-            </div>
+            @else
+                <p class="text-center text-gray-500 py-8">Brak komentarzy. Bądź pierwszą osobą, która skomentuje.</p>
+            @endif
         </section>
 
         <!-- Related Posts -->
@@ -361,4 +339,81 @@
 
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-reply-toggle]').forEach((toggleButton) => {
+                const container = toggleButton.closest('[data-reply-container]');
+                const panel = container?.querySelector('[data-reply-panel]');
+
+                if (!panel) {
+                    return;
+                }
+
+                let isOpen = false;
+
+                toggleButton.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        panel.style.maxHeight = `${panel.scrollHeight}px`;
+                        panel.style.opacity = '1';
+                    } else {
+                        panel.style.maxHeight = '0';
+                        panel.style.opacity = '0';
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-reaction-form]').forEach((form) => {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const reactionGroup = form.closest('[data-reaction-group]');
+
+                    if (!reactionGroup) {
+                        return;
+                    }
+
+                    const submitButton = form.querySelector('button[type="submit"]');
+
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                    }
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: new FormData(form),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Nie udało się zapisać reakcji.');
+                        }
+
+                        const payload = await response.json();
+                        const likeCount = reactionGroup.querySelector('[data-like-count]');
+                        const dislikeCount = reactionGroup.querySelector('[data-dislike-count]');
+
+                        if (likeCount) {
+                            likeCount.textContent = String(payload.likes ?? 0);
+                        }
+
+                        if (dislikeCount) {
+                            dislikeCount.textContent = String(payload.dislikes ?? 0);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </x-layout>
