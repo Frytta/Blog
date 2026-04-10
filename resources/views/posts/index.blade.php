@@ -74,7 +74,7 @@
                 @endphp
 
                 <article
-                    class="overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl dark:bg-gray-900 dark:shadow-gray-950/50 dark:hover:shadow-2xl dark:hover:shadow-gray-950/70">
+                    class="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:bg-gray-900 dark:shadow-gray-950/50 dark:hover:-translate-y-1 dark:hover:bg-gray-900/90 dark:hover:shadow-2xl dark:hover:shadow-indigo-950/40 dark:hover:ring-1 dark:hover:ring-indigo-400/35">
                     @if ($post->photo)
                         <div class="h-48 bg-gray-100 dark:bg-gray-800">
                             <img src="{{ asset('storage/' . $post->photo) }}" alt="Banner: {{ $post->title }}"
@@ -83,6 +83,7 @@
                     @else
                         <div class="h-48" style="{{ $fallbackGradientStyle }}"></div>
                     @endif
+                    <a href="{{ route('posts.show', $post->slug) }}" class="absolute inset-0 z-10" aria-label="Przejdź do posta: {{ $post->title }}"></a>
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3">
                             @if ($post->is_published)
@@ -121,14 +122,14 @@
                             <div class="text-right space-y-1" data-post-reaction-group>
                                 <div class="flex items-center justify-end gap-1.5 text-xs font-medium">
                                     <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">👁 {{ number_format($post->views) }}</span>
-                                    <form method="POST" action="{{ route('posts.like', $post) }}" data-post-reaction-form>
+                                    <form method="POST" action="{{ route('posts.like', $post) }}" data-post-reaction-form class="relative z-20">
                                         @csrf
                                         <button type="submit"
                                             class="rounded-full border border-orange-200 bg-orange-100 px-2 py-0.5 text-orange-700 transition-colors hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-300 dark:hover:bg-orange-900/50">
                                             ▲ <span data-like-count>{{ number_format($post->likes) }}</span>
                                         </button>
                                     </form>
-                                    <form method="POST" action="{{ route('posts.dislike', $post) }}" data-post-reaction-form>
+                                        <form method="POST" action="{{ route('posts.dislike', $post) }}" data-post-reaction-form class="relative z-20">
                                         @csrf
                                         <button type="submit"
                                             class="rounded-full border border-blue-200 bg-blue-100 px-2 py-0.5 text-blue-700 transition-colors hover:bg-blue-200 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50">
@@ -137,7 +138,7 @@
                                     </form>
                                 </div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $post->created_at->diffForHumans() }}</p>
-                                <form method="POST" action="{{ route('posts.destroy', $post->slug) }}" class="mt-1"
+                                <form method="POST" action="{{ route('posts.destroy', $post->slug) }}" class="relative z-20 mt-1"
                                     onsubmit="return confirm('Czy na pewno chcesz usunąć ten post?')">
                                     @csrf
                                     @method('DELETE')

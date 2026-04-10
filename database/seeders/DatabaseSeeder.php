@@ -18,10 +18,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::query()->updateOrCreate(
+            ['email' => 'test@example.com'],
+            User::factory()->make([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ])->toArray(),
+        );
 
         Tag::query()->upsert([
             ['name' => 'Laravel', 'slug' => 'laravel'],
@@ -32,6 +35,12 @@ class DatabaseSeeder extends Seeder
             ['name' => 'JavaScript', 'slug' => 'javascript'],
             ['name' => 'Docker', 'slug' => 'docker'],
             ['name' => 'DevOps', 'slug' => 'devops'],
+            ['name' => 'Testing', 'slug' => 'testing'],
+            ['name' => 'Pest', 'slug' => 'pest'],
+            ['name' => 'API', 'slug' => 'api'],
+            ['name' => 'Performance', 'slug' => 'performance'],
+            ['name' => 'Security', 'slug' => 'security'],
+            ['name' => 'CI/CD', 'slug' => 'cicd'],
         ], ['slug'], ['name']);
     }
 }
